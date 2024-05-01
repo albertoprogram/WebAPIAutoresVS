@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using WebAPIAutoresVS.Servicios;
 
 namespace WebAPIAutoresVS
 {
@@ -18,6 +19,13 @@ namespace WebAPIAutoresVS
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("defaultConnection")));
+
+            builder.Services.AddTransient<IServicio, ServicioA>();
+            //builder.Services.AddTransient<ServicioA>();
+
+            builder.Services.AddTransient<ServicioTransient>();
+            builder.Services.AddScoped<ServicioScoped>();
+            builder.Services.AddSingleton<ServicioSingleton>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
