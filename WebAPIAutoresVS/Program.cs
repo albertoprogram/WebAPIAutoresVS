@@ -33,7 +33,37 @@ namespace WebAPIAutoresVS
 
             var app = builder.Build();
 
+            var servicioLogger = (ILogger<Program>)app.Services.GetService(typeof(ILogger<Program>));
+
             // Configure the HTTP request pipeline.
+            app.Use(async (contexto, siguiente) =>
+            {
+                using (var ms = new MemoryStream())
+                {
+                    var cuerpoOriginalRespuesta = contexto.Response.Body;
+                    contexto.Response.Body = ms;
+
+                    await siguiente.Invoke();
+
+                    ms.Seek(0, SeekOrigin.Begin);
+                    string respuesta = new StreamReader(ms).ReadToEnd();
+                    ms.Seek(0, SeekOrigin.Begin);
+
+                    await ms.CopyToAsync(cuerpoOriginalRespuesta);
+                    contexto.Response.Body = cuerpoOriginalRespuesta;
+
+                    servicioLogger.LogInformation(respuesta);
+                }
+            });
+
+            app.Map("/ruta1", app =>
+            {
+                app.Run(async contexto =>
+                {
+                    await contexto.Response.WriteAsync("Estoy interceptando la tubería");
+                });
+            });
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
