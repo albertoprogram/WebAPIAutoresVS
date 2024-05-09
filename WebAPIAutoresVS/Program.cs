@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using WebAPIAutoresVS.Filtros;
+using WebAPIAutoresVS.Middlewares;
 using WebAPIAutoresVS.Servicios;
 
 namespace WebAPIAutoresVS
@@ -26,6 +29,11 @@ namespace WebAPIAutoresVS
             builder.Services.AddTransient<ServicioTransient>();
             builder.Services.AddScoped<ServicioScoped>();
             builder.Services.AddSingleton<ServicioSingleton>();
+            builder.Services.AddTransient<MiFiltroDeAccion>();
+
+            builder.Services.AddResponseCaching();
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -36,25 +44,8 @@ namespace WebAPIAutoresVS
             var servicioLogger = (ILogger<Program>)app.Services.GetService(typeof(ILogger<Program>));
 
             // Configure the HTTP request pipeline.
-            app.Use(async (contexto, siguiente) =>
-            {
-                using (var ms = new MemoryStream())
-                {
-                    var cuerpoOriginalRespuesta = contexto.Response.Body;
-                    contexto.Response.Body = ms;
-
-                    await siguiente.Invoke();
-
-                    ms.Seek(0, SeekOrigin.Begin);
-                    string respuesta = new StreamReader(ms).ReadToEnd();
-                    ms.Seek(0, SeekOrigin.Begin);
-
-                    await ms.CopyToAsync(cuerpoOriginalRespuesta);
-                    contexto.Response.Body = cuerpoOriginalRespuesta;
-
-                    servicioLogger.LogInformation(respuesta);
-                }
-            });
+            //app.UseMiddleware<LoguearRespuestaHTTPMiddleware>();
+            app.UseLoguearRespuestaHTTP();
 
             app.Map("/ruta1", app =>
             {
@@ -73,6 +64,8 @@ namespace WebAPIAutoresVS
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseResponseCaching();
 
             app.UseAuthorization();
 

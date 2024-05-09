@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPIAutoresVS.Entidades;
+using WebAPIAutoresVS.Filtros;
 using WebAPIAutoresVS.Servicios;
 
 namespace WebAPIAutoresVS.Controllers
 {
     [ApiController]
     [Route("api/autores")]
+    //[Authorize]
     public class AutoresController : ControllerBase
     {
         private readonly ApplicationDbContext context;
@@ -29,6 +32,8 @@ namespace WebAPIAutoresVS.Controllers
         }
 
         [HttpGet("GUID")]
+        //[ResponseCache(Duration = 10)]
+        [ServiceFilter(typeof(MiFiltroDeAccion))]
         public ActionResult ObtenerGuids()
         {
             return Ok(new
@@ -46,6 +51,8 @@ namespace WebAPIAutoresVS.Controllers
         [HttpGet("listado")]
         [HttpGet("/listado")]
         [HttpGet("listado/principal")]
+        //[ResponseCache(Duration = 10)]
+        [ServiceFilter(typeof(MiFiltroDeAccion))]
         public async Task<ActionResult<List<Autor>>> Get()
         {
             logger.LogInformation(DateTime.Now.ToString() + " --- " + "Estamos obteniendo los autores");
