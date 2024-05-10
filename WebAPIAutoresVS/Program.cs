@@ -15,7 +15,10 @@ namespace WebAPIAutoresVS
 
             // Add services to the container.
 
-            builder.Services.AddControllers().AddJsonOptions(x =>
+            builder.Services.AddControllers(opciones =>
+            {
+                opciones.Filters.Add(typeof(FiltroDeExcepcion));
+            }).AddJsonOptions(x =>
             x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
             //builder.Services.AddSingleton(builder.Configuration);
@@ -30,6 +33,7 @@ namespace WebAPIAutoresVS
             builder.Services.AddScoped<ServicioScoped>();
             builder.Services.AddSingleton<ServicioSingleton>();
             builder.Services.AddTransient<MiFiltroDeAccion>();
+            builder.Services.AddHostedService<EscribirEnArchivo>();
 
             builder.Services.AddResponseCaching();
 
