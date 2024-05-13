@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using WebAPIAutoresVS.Filtros;
 using WebAPIAutoresVS.Middlewares;
-using WebAPIAutoresVS.Servicios;
 
 namespace WebAPIAutoresVS
 {
@@ -26,17 +25,6 @@ namespace WebAPIAutoresVS
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("defaultConnection")));
 
-            builder.Services.AddTransient<IServicio, ServicioA>();
-            //builder.Services.AddTransient<ServicioA>();
-
-            builder.Services.AddTransient<ServicioTransient>();
-            builder.Services.AddScoped<ServicioScoped>();
-            builder.Services.AddSingleton<ServicioSingleton>();
-            builder.Services.AddTransient<MiFiltroDeAccion>();
-            builder.Services.AddHostedService<EscribirEnArchivo>();
-
-            builder.Services.AddResponseCaching();
-
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -48,16 +36,7 @@ namespace WebAPIAutoresVS
             var servicioLogger = (ILogger<Program>)app.Services.GetService(typeof(ILogger<Program>));
 
             // Configure the HTTP request pipeline.
-            //app.UseMiddleware<LoguearRespuestaHTTPMiddleware>();
             app.UseLoguearRespuestaHTTP();
-
-            app.Map("/ruta1", app =>
-            {
-                app.Run(async contexto =>
-                {
-                    await contexto.Response.WriteAsync("Estoy interceptando la tubería");
-                });
-            });
 
             if (app.Environment.IsDevelopment())
             {
@@ -68,8 +47,6 @@ namespace WebAPIAutoresVS
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
-            app.UseResponseCaching();
 
             app.UseAuthorization();
 

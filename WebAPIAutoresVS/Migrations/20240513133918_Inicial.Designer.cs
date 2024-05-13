@@ -11,8 +11,8 @@ using WebAPIAutoresVS;
 namespace WebAPIAutoresVS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240328140607_Libros")]
-    partial class Libros
+    [Migration("20240513133918_Inicial")]
+    partial class Inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,8 @@ namespace WebAPIAutoresVS.Migrations
 
                     b.Property<string>("Nombre")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
 
                     b.HasKey("Id");
 
@@ -49,34 +50,13 @@ namespace WebAPIAutoresVS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AutorId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Titulo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AutorId");
-
                     b.ToTable("Libros");
-                });
-
-            modelBuilder.Entity("WebAPIAutoresVS.Entidades.Libro", b =>
-                {
-                    b.HasOne("WebAPIAutoresVS.Entidades.Autor", "Autor")
-                        .WithMany("Libros")
-                        .HasForeignKey("AutorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Autor");
-                });
-
-            modelBuilder.Entity("WebAPIAutoresVS.Entidades.Autor", b =>
-                {
-                    b.Navigation("Libros");
                 });
 #pragma warning restore 612, 618
         }
