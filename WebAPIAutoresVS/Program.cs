@@ -31,6 +31,8 @@ namespace WebAPIAutoresVS
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddAutoMapper(typeof(Program));
+
             var app = builder.Build();
 
             var servicioLogger = (ILogger<Program>)app.Services.GetService(typeof(ILogger<Program>));
