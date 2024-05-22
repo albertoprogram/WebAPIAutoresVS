@@ -10,8 +10,11 @@ namespace WebAPIAutoresVS.Utilidades
         {
             CreateMap<AutorCreacionDTO, Autor>();
             CreateMap<Autor, AutorDTO>();
+
             CreateMap<LibroCreacionDTO, Libro>();
             CreateMap<Libro, LibroDTO>();
+            CreateMap<Libro,LibroDTOOnly>();
+
             CreateMap<ComentarioCreacionDTO, Comentario>();
             CreateMap<Comentario, ComentarioDTO>();
         }

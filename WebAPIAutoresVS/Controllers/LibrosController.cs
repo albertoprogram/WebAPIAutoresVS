@@ -22,10 +22,21 @@ namespace WebAPIAutoresVS.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<LibroDTO>> Get(int id)
         {
-            var libro = await context.Libros.FirstOrDefaultAsync(x => x.Id == id);
+            var libro = await context.Libros
+                .Include(libroBD => libroBD.Comentarios)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             return mapper.Map<LibroDTO>(libro);
         }
+
+        //[HttpGet("onlybook/{id:int}")]
+        //public async Task<ActionResult<LibroDTOOnly>> GetSoloLibro(int id)
+        //{
+        //    var libro = await context.Libros
+        //        .FirstOrDefaultAsync(x => x.Id == id);
+
+        //    return mapper.Map<LibroDTOOnly>(libro);
+        //}
 
         [HttpPost]
         public async Task<ActionResult> Post(LibroCreacionDTO libroCreacionDTO)
