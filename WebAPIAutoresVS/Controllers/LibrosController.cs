@@ -29,14 +29,18 @@ namespace WebAPIAutoresVS.Controllers
             return mapper.Map<LibroDTO>(libro);
         }
 
-        //[HttpGet("onlybook/{id:int}")]
-        //public async Task<ActionResult<LibroDTOOnly>> GetSoloLibro(int id)
-        //{
-        //    var libro = await context.Libros
-        //        .FirstOrDefaultAsync(x => x.Id == id);
+        [HttpGet("onlybook/{id:int}")]
+        public async Task<ActionResult<LibroDTOOnly>> GetSoloLibro(int id)
+        {
+            var libro = await context.Libros
+                .Include(libroDB => libroDB.AutoresLibros)
+                .ThenInclude(autorLibroDB => autorLibroDB.Autor)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-        //    return mapper.Map<LibroDTOOnly>(libro);
-        //}
+            libro.AutoresLibros = libro.AutoresLibros.OrderBy(x => x.Orden).ToList();
+
+            return mapper.Map<LibroDTOOnly>(libro);
+        }
 
         [HttpPost]
         public async Task<ActionResult> Post(LibroCreacionDTO libroCreacionDTO)
