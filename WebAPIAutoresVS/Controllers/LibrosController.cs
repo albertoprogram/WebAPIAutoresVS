@@ -30,7 +30,7 @@ namespace WebAPIAutoresVS.Controllers
         }
 
         [HttpGet("onlybook/{id:int}")]
-        public async Task<ActionResult<LibroDTOOnly>> GetSoloLibro(int id)
+        public async Task<ActionResult<LibroDTOConAutores>> GetSoloLibro(int id)
         {
             var libro = await context.Libros
                 .Include(libroDB => libroDB.AutoresLibros)
@@ -39,7 +39,7 @@ namespace WebAPIAutoresVS.Controllers
 
             libro.AutoresLibros = libro.AutoresLibros.OrderBy(x => x.Orden).ToList();
 
-            return mapper.Map<LibroDTOOnly>(libro);
+            return mapper.Map<LibroDTOConAutores>(libro);
         }
 
         [HttpPost]
