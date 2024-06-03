@@ -68,7 +68,7 @@ namespace WebAPIAutoresVS.Controllers
             return CreatedAtRoute("ObtenerComentario", new { id = comentario.Id, libroId = libroId }, comentarioDTO);
         }
 
-        [HttpPut]
+        [HttpPut] //
         public async Task<ActionResult> Put(int libroId, int id, ComentarioCreacionDTO comentarioCreacionDTO)
         {
             var existeLibro = await context.Libros.AnyAsync(libroDB => libroDB.Id == libroId);
