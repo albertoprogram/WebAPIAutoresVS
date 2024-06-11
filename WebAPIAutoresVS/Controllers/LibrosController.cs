@@ -27,6 +27,11 @@ namespace WebAPIAutoresVS.Controllers
                 .Include(libroBD => libroBD.Comentarios)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
+            if (libro == null)
+            {
+                return NotFound($"El libro indicado con id: '{id}' no existe");
+            }
+
             return mapper.Map<LibroDTO>(libro);
         }
 
@@ -37,6 +42,11 @@ namespace WebAPIAutoresVS.Controllers
                 .Include(libroDB => libroDB.AutoresLibros)
                 .ThenInclude(autorLibroDB => autorLibroDB.Autor)
                 .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (libro == null)
+            {
+                return NotFound($"El libro indicado con id: '{id}' no existe");
+            }
 
             libro.AutoresLibros = libro.AutoresLibros.OrderBy(x => x.Orden).ToList();
 
@@ -136,6 +146,23 @@ namespace WebAPIAutoresVS.Controllers
             await context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var existe = await context.Libros.AnyAsync(x => x.Id == id);
+
+            if (!existe)
+            {
+                return NotFound();
+            }
+
+            context.Remove(new Libro() { Id = id });
+
+            await context.SaveChangesAsync();
+
+            return Ok();
         }
     }
 }
