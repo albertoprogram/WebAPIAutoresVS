@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using WebAPIAutoresVS.Filtros;
@@ -33,6 +34,10 @@ namespace WebAPIAutoresVS
 
             builder.Services.AddAutoMapper(typeof(Program));
 
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
             var app = builder.Build();
 
             var servicioLogger = (ILogger<Program>)app.Services.GetService(typeof(ILogger<Program>));
@@ -42,7 +47,7 @@ namespace WebAPIAutoresVS
 
             if (app.Environment.IsDevelopment())
             {
-                
+
             }
 
             app.UseSwagger();
