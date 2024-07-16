@@ -11,6 +11,7 @@ namespace WebAPIAutoresVS.Controllers
 {
     [ApiController]
     [Route("api/autores")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AutoresController : ControllerBase
     {
         private readonly ApplicationDbContext context;
@@ -31,7 +32,7 @@ namespace WebAPIAutoresVS.Controllers
         }
 
         [HttpGet]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [AllowAnonymous]
         public async Task<ActionResult<List<AutorDTO>>> Get()
         {
             var autores = await context.Autores.ToListAsync();
