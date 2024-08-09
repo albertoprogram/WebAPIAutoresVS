@@ -87,6 +87,11 @@ namespace WebAPIAutoresVS
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            builder.Services.AddAuthorization(opciones =>
+            {
+                opciones.AddPolicy("EsAdmin", politica => politica.RequireClaim("esAdmin"));
+            });
+
             var app = builder.Build();
 
             var servicioLogger = (ILogger<Program>)app.Services.GetService(typeof(ILogger<Program>));
