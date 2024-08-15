@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text;
 using WebAPIAutoresVS.DTOs;
@@ -40,7 +41,7 @@ namespace WebAPIAutoresVS.Controllers
 
             if (resultado.Succeeded)
             {
-                return ConstuirToken(credencialesUsuario);
+                return await ConstuirToken(credencialesUsuario);
             }
             else
             {
@@ -56,7 +57,7 @@ namespace WebAPIAutoresVS.Controllers
 
             if (resultado.Succeeded)
             {
-                return ConstuirToken(credencialesUsuario);
+                return await ConstuirToken(credencialesUsuario);
             }
             else
             {
@@ -66,7 +67,7 @@ namespace WebAPIAutoresVS.Controllers
 
         [HttpGet("RenovarToken")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<RespuestaAutenticacion> Renovar()
+        public async Task<ActionResult<RespuestaAutenticacion>> Renovar()
         {
             var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
 
@@ -77,16 +78,21 @@ namespace WebAPIAutoresVS.Controllers
                 Email = email
             };
 
-            return ConstuirToken(credencialesUsuario);
+            return await ConstuirToken(credencialesUsuario);
         }
 
-        private RespuestaAutenticacion ConstuirToken(CredencialesUsuario credencialesUsuario)
+        private async Task<RespuestaAutenticacion> ConstuirToken(CredencialesUsuario credencialesUsuario)
         {
             var claims = new List<Claim>()
             {
                 new Claim("email",credencialesUsuario.Email),
                 new Claim("valorCualquiera","Un Valor Cualquiera")
             };
+
+            var usuario = await userManager.FindByEmailAsync(credencialesUsuario.Email);
+            var claimsDB = await userManager.GetClaimsAsync(usuario);
+
+            claims.AddRange(claimsDB);
 
             var llave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["llavejwt"]));
             var creds = new SigningCredentials(llave, SecurityAlgorithms.HmacSha256);
@@ -101,6 +107,22 @@ namespace WebAPIAutoresVS.Controllers
                 Token = new JwtSecurityTokenHandler().WriteToken(securityToken),
                 Expiracion = expiracion
             };
+        }
+
+        [HttpPost("HacerAdmin")]
+        public async Task<ActionResult> HacerAdmin(EditarAdminDTO editarAdminDTO)
+        {
+            var usuario = await userManager.FindByEmailAsync(editarAdminDTO.Email);
+            await userManager.AddClaimAsync(usuario, new Claim("esAdmin", "1"));
+            return NoContent();
+        }
+
+        [HttpPost("RemoverAdmin")]
+        public async Task<ActionResult> RemoverAdmin(EditarAdminDTO editarAdminDTO)
+        {
+            var usuario = await userManager.FindByEmailAsync(editarAdminDTO.Email);
+            await userManager.RemoveClaimAsync(usuario, new Claim("esAdmin", "1"));
+            return NoContent();
         }
     }
 }
