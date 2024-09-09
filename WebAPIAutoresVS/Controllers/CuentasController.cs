@@ -49,6 +49,28 @@ namespace WebAPIAutoresVS.Controllers
             });
         }
 
+        [HttpGet("encriptarPorTiempo")]
+        public ActionResult EncriptarPorTiempo()
+        {
+            var protectorLimitadoPorTiempo = dataProtector.ToTimeLimitedDataProtector();
+
+            var textoPlano = "Un valor a encriptar";
+
+            var textoCifrado = protectorLimitadoPorTiempo.Protect(textoPlano, lifetime: TimeSpan.FromSeconds(5));
+
+            //For test
+            Thread.Sleep(TimeSpan.FromSeconds(6));
+
+            var textoDesencriptado = protectorLimitadoPorTiempo.Unprotect(textoCifrado);
+
+            return Ok(new
+            {
+                textoPlano = textoPlano,
+                textoCifrado = textoCifrado,
+                textoDesencriptado = textoDesencriptado
+            });
+        }
+
         [HttpPost("registrar")]
         public async Task<ActionResult<RespuestaAutenticacion>> Registrar(CredencialesUsuario credencialesUsuario)
         {
