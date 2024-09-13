@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text;
 using WebAPIAutoresVS.DTOs;
+using WebAPIAutoresVS.Servicios;
 
 namespace WebAPIAutoresVS.Controllers
 {
@@ -19,17 +20,34 @@ namespace WebAPIAutoresVS.Controllers
         private readonly UserManager<IdentityUser> userManager;
         private readonly IConfiguration configuration;
         private readonly SignInManager<IdentityUser> signInManager;
+        private readonly HashService hashService;
         private readonly IDataProtector dataProtector;
 
         public CuentasController(UserManager<IdentityUser> userManager,
             IConfiguration configuration,
             SignInManager<IdentityUser> signInManager,
-            IDataProtectionProvider dataProtectionProvider)
+            IDataProtectionProvider dataProtectionProvider,
+            HashService hashService)
         {
             this.userManager = userManager;
             this.configuration = configuration;
             this.signInManager = signInManager;
+            this.hashService = hashService;
             dataProtector = dataProtectionProvider.CreateProtector("valor_unico_y_quizas_secreto");
+        }
+
+        [HttpGet("hash/{textoPlano}")]
+        public ActionResult RealizarHash(string textoPlano)
+        {
+            var resultado1 = hashService.Hash(textoPlano);
+            var resultado2 = hashService.Hash(textoPlano);
+
+            return Ok(new
+            {
+                textoPlano = textoPlano,
+                Hash1 = resultado1,
+                Hash2 = resultado2
+            });
         }
 
         [HttpGet("encriptar")]

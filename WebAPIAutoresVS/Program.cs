@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using WebAPIAutoresVS.Filtros;
 using WebAPIAutoresVS.Middlewares;
+using WebAPIAutoresVS.Servicios;
 
 namespace WebAPIAutoresVS
 {
@@ -93,6 +94,8 @@ namespace WebAPIAutoresVS
             });
 
             builder.Services.AddDataProtection();
+
+            builder.Services.AddTransient<HashService>();
 
             builder.Services.AddCors(opciones =>
             {
